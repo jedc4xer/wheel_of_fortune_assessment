@@ -51,7 +51,47 @@ def get_words(difficulty):
 
 def get_random_word(words):
     return(random.choice(words))
+
+def display_word(word, guessed_letters, new_guess):
     
+    pre_reveal = ""
+    for char in word:
+        if char in new_guess:
+            pre_reveal += "# "
+        elif char in string.punctuation:
+            pre_reveal += char + " "
+        elif char in guessed_letters:
+            pre_reveal += char + " "
+        else:
+            pre_reveal += '_ '
+    
+    guessed_letters += new_guess
+ 
+    # Slow the reveal
+    revealing = ""
+    for char in pre_reveal:
+        os.system(clear_term)
+        print(template[3])
+        revealing += char
+        print(revealing.center(78," "))
+        time.sleep(0.2)
+        
+    time.sleep(2)
+    
+    revealed = "  "
+    for char in word:
+        if char in guessed_letters:
+            revealed += char + " "
+        elif char in string.punctuation:
+            revealed += char + " "
+        else:
+            revealed += "_" + " "
+    os.system(clear_term)
+    print(template[3])
+    print(revealed.center(78," "))
+        
+#     guess_status = f"  |  {len(''.join(_ for _ in random_word if _ in guesses))} out of {len(random_word)} characters guessed."
+#     print("\n    ", display_string, guess_status)
         
 def display_wheels(wheel_selection):
     wheels = get_wheels()[:-1]
@@ -181,5 +221,6 @@ template = get_template()
 menus = get_menus()
 difficulty = set_difficulty()
 words = get_words(difficulty)
-word = get_random_word(words)
+word = get_random_word(words).upper()
+display_word(word, [_ for _ in word], ['A'])
 print(word)
