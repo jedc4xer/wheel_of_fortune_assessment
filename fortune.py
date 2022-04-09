@@ -1,25 +1,48 @@
 import os
 import requests
 import time
+import string
 
 # Assign system flexible clear variable
 clear_term = "cls||clear"
 os.system(clear_term)
 
 def get_files(path):
-    file = requests.get(path).text.split(",")
+    file = requests.get(path).text
     return file
 
 def get_wheels():
     path = 'https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/ascii_wheels.txt'
-    wheels = get_files(path)
+    wheels = get_files(path).split(",")
     return wheels
 
 def get_template():
     path = 'https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/template.txt'
-    template = get_files(path)
+    template = get_files(path).split(",")
     return template
 
+def get_words(difficulty):
+    path = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
+    words = get_files(path).replace("\n", "").split("\r")
+    
+    if difficulty == 'easy':
+        word_subset = [_ for _ in words if (len(_) <= 7 and len(_) > 5)]
+    elif difficulty == 'medium':
+        word_subset = [_ for _ in words if (len(_) <= 12 and len(_) > 7)]
+    elif difficulty == 'hard':
+        word_subset = [_ for _ in words if (len(_) <= 18 and len(_) > 12)]
+    elif difficulty == 'basic assessment':
+        word_subset = [
+            _ for _ in words if (
+            len(_) > 18 and 
+            _.count('a') <= 2 and 
+            _.count('e') <= 2
+            )]
+    total = "{:,}".format(len(words))
+    filtered = "{:,}".format(len(word_subset))
+    print(f'{total} words found - Filtering to {filtered} words\n\n')
+    return word_subset
+        
 def display_wheels(wheel_selection):
     wheels = get_wheels()[:-1]
 
@@ -80,6 +103,11 @@ def display_players(players, detail):
             print(f' {assigned}: {name} | Bank: ${bank} | Round Stash: ${stash}')
         print('\n')
             
+def set_difficulty():
+    passed = False
+    while not passed:
+        difficulty = input("  Game Difficulty: >> ")
+        passed = check_input(difficulty,'number',4)
 def get_players():
     
     players = {
@@ -108,8 +136,11 @@ def get_players():
             os.system(clear_term)
     return players
                     
-
+#def round_controller(players, current_round):
+ #   if current_round < 3:
+        
 #display_welcome_message()
 
-players = get_players()
-display_players(players,'dash')
+#players = get_players()
+#display_players(players,'dash')
+words = get_words('medium')

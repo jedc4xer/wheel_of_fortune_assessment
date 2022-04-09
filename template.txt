@@ -10,4 +10,14 @@
   |                DATA PROFESSIONAL STUDIOS WELCOMES YOU TO               |
   |                        !!! WHEEL OF FORTUNE !!!                        |  
   ##########################################################################
+,  **************************************************************************
+  |                       DATA PROFESSIONAL STUDIOS                        |
+  |                        *** WHEEL OF FORTUNE ***          (by Jed Dryer)|  
+  ##########################################################################
+,  ** Difficulty Options **
+  ------------------------
+  1. Basic Assessment
+  2. Easy
+  3. Medium
+  4. Hard
 ,
