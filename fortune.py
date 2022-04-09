@@ -3,11 +3,24 @@ import requests
 import time
 import string
 import random
+from collections import Counter
 
 # Assign system flexible clear variable
 clear_term = "cls||clear"
 os.system(clear_term)
 
+def quick_exit():
+    print("\n\n  Taking the walk of shame I see! Was it too difficult?")
+    time.sleep(1)
+    print("  Couldn't handle the shame and realizing that this moment will go down in history?")
+    time.sleep(1)
+    print("\n  Here is a consolation prize.")
+    time.sleep(0.3)
+    print("   ** Hands player paper bag with pretzel and cracker samples **")
+    time.sleep(1)
+    print("\n  The exit is over there... \n")
+    raise SystemExit
+    
 def get_files(path):
     return(requests.get(path).text)
 
@@ -90,8 +103,6 @@ def display_word(word, guessed_letters, new_guess):
     print(template[3])
     print(revealed.center(78," "))
         
-#     guess_status = f"  |  {len(''.join(_ for _ in random_word if _ in guesses))} out of {len(random_word)} characters guessed."
-#     print("\n    ", display_string, guess_status)
         
 def display_wheels(wheel_selection):
     wheels = get_wheels()[:-1]
@@ -130,7 +141,7 @@ def check_input(input_str,type_requirement,limits):
             if int(input_str) in range(limits + 1):
                 return True
             
-    print(f'{input_str} is not a valid {type_requirement}.')
+    print(f'  {input_str} is not a valid {type_requirement}.')
     time.sleep(2)
     return False
 
@@ -185,7 +196,8 @@ def get_players():
             'stash': 0,
             'guesses': 0,
             'correct': 0,
-            'status': None
+            'status': None,
+            'jackpot': 0
         }, 
         'Player 2': {
             'name': None,
@@ -193,7 +205,8 @@ def get_players():
             'stash': 0,
             'guesses': 0,
             'correct': 0,
-            'status': None
+            'status': None,
+            'jackpot': 0
         }, 
         'Player 3': {
             'name': None,
@@ -201,7 +214,8 @@ def get_players():
             'stash': 0,
             'guesses': 0,
             'correct': 0,
-            'status': None
+            'status': None,
+            'jackpot': 0
         }
     }
     
@@ -266,24 +280,93 @@ def build_player_queue(play):
     ]
     return player_queue
 
-def player_turn(players,player,current_round,word):
+def spin_result_logic(players,player,spin):
+    """ This function holds the logic for what to do with a spin. """
+    if spin == 'BANKRUPT':
+        print('You are bankrupt.')
+        players[player]['stash'] = 0
+        players[player]['jackpot'] = 0
+        spin_result = 'BANKRUPT'
+    elif spin == 'LOSE A TURN':
+        print('You lost a turn.')
+        spin_result = 'LOST TURN'
+    elif spin == 'JACKPOT':
+        """
+        JACKPOT is a very difficult one to reason out. My interpretation is
+        that if a player lands on jackpot, then the jackpot starts growing at
+        5000 and accumulates additional based on every following player's
+        wheelspins. The player that lands on jackpot can win the jackpot by 
+        guessing the answer during their turn, and if their turn ends, they
+        will need to wait for their following turn to attempt a guess. Any 
+        number of players can land on jackpot, and the winner will be the one
+        who correctly answers. If they land on jackpot on more than one turn, 
+        they get an additional 5000.
+        """
+        print('You hit the jackpot.')
+        players[player]['jackpot'] += 5000
+        spin_result = 'JACKPOT'
+    elif spin == 'MYSTERY':
+        print('You landed on mystery.')
+        mystery_revealed = random.choice([1,2])
+        if mystery_revealed == 1:
+            spin_result = 'MYSTERY 1000'
+            players[player]['stash'] += 1000
+        if mystery_revealed == 2:
+            spin_result = 'MYSTERY BANKRUPT'
+            players[player]['stash'] = 0
+            players[player]['jackpot'] = 0
+            
+    elif spin == 'ONE MILLION DOLLARS':
+        print('One Million Dollars.')
+        players[player]['stash'] += 1000000
+    else:
+        players[player]['stash'] += int(spin)
+        
+        # Add earnings to the stash of any jackpot players.
+        for key in players.keys():
+            if players[key]['jackpot'] > 0:
+                players[key]['jackpot'] += int(spin)
+
+
+def player_turn(players,player,current_round,word,layout,not_spun):
     """ This function contains all the actions for each player turn. """
+    os.system(clear_term)
     print(template[3])
     display_turn_info(players[player],current_round)
     print(menus[1])
     
-    choices = {
-        '1': get_spin_result(layout),
-        '2': test_spinner(layout),
-        '3': raise SystemExit
-    }
+    print(players)
+    # choices = {
+    #     '1': get_spin_result,
+    #     '2': test_spinner,
+    #     '3': quick_exit
+    # }
     
     num_options = 3
     passed = False
     while not passed:
         choice = input("  Choose an action: >> ")
         passed = check_input(choice,'number',num_options)
-    choice = choices[choice]
+    #var = layout if choice != '3' else None
+    # choice = choices[choice](var)
+    if choice == '1':
+        spin = get_spin_result(layout)
+        spin_result_logic(players,player,spin)
+        time.sleep(2)
+        not_spun = False
+    elif choice == '2':
+        if not_spun:
+            print('  The results will be viewable for 10 seconds.')
+            time.sleep(2)
+            test_spinner(layout)
+            time.sleep(10)
+            player_turn(players,player,current_round,word,layout,True)
+    else:
+        quick_exit()
+    
+    
+            
+            
     
     
 def round_controller(players, current_round):
@@ -294,7 +377,7 @@ def round_controller(players, current_round):
         available_players = [_ for _ in players.keys()]
         player_queue = build_player_queue(available_players)
         for player in player_queue:
-            player_turn(players,player,current_round,word)
+            players = player_turn(players,player,current_round,word,layout,True)
             
             
             
