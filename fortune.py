@@ -156,6 +156,16 @@ def display_players(players, detail):
             stash = players[assigned]['stash']
             print(f' {assigned}: {name} | Bank: ${bank} | Round Stash: ${stash}')
         print('\n')
+        
+def display_turn_info(player,current_round):
+    """ This function displays the active turn information. """
+    name = player['name']
+    stash = player['stash']
+    bank = player['bank']
+    print(f"  Current Round: {current_round}\n")
+    print(f"  Player Name: {name}\n  Round Stash: ${stash}\n  Total Bank: ${bank}")
+    
+    
             
 def set_difficulty():
     print(menus[0])
@@ -209,18 +219,82 @@ def get_players():
                     passed += 1
             os.system(clear_term)
     return players
-                    
-#def round_controller(players, current_round):
- #   if current_round < 3:
-        
+
+def establish_wheel_layout():
+    money_prizes = [_ for _ in range(100,950,50)]
+    spare = [random.randrange(1000,5000,500)]
+    money_prizes += spare
+    millions = ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT')
+    layout = [
+        millions,'AVAILABLE','AVAILABLE','AVAILABLE','JACKPOT','AVAILABLE',
+        'AVAILABLE','AVAILABLE','MYSTERY','AVAILABLE','AVAILABLE','AVAILABLE',
+        'BANKRUPT','AVAILABLE','AVAILABLE','AVAILABLE','BANKRUPT','AVAILABLE',
+        'AVAILABLE','AVAILABLE','AVAILABLE','LOSE A TURN','AVAILABLE','AVAILABLE'
+    ]
+    layout = [
+        money_prizes.pop(random.randint(0,len(money_prizes)-1)) 
+        if _ == 'AVAILABLE' else _ for _ in layout
+    ]
+    return layout
+
+def get_spin_result(layout):
+    result = random.choice(layout)
+    if result == ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT'):  
+        result = random.choice(result)
+        if result != 'BANKRUPT':
+            return result
+        else:
+            return result
+    return result
+
+def test_spinner(layout):
+    results = []
+    for spin in range(100000):
+        results.append(get_spin_result(layout))
+    summary = dict(Counter(results))
+    summary = ["  " + str(key) + ": " + str(round((summary[key]/100000) * 100,2)) + "%" for key in summary.keys()]
+    summary.sort(key = lambda x: x.split(": ")[1], reverse = False)
+    summary = "\n".join(summary)
+    print(f'\n\n  Spin Results: (100,000 spins)\n  ----------------->\n{summary}\n')
+    
+
+def build_player_queue(play):
+    player_queue = [
+        play.pop(random.randint(0,len(play)-1)),
+        play.pop(random.randint(0,len(play)-1)),
+        play.pop(random.randint(0,len(play)-1))
+    ]
+    return player_queue
+
+def player_turn(players,player,current_round,word):
+    """ This function contains all the actions for each player turn. """
+    print(template[3])
+    display_turn_info(players[player],current_round)
+    print(menus[1])
+    
+    
+def round_controller(players, current_round):
+    word = get_random_word(words).upper()
+    layout = establish_wheel_layout()
+    display_word(word, [_ for _ in word], ['A'])
+    if current_round < 3:
+        available_players = [_ for _ in players.keys()]
+        player_queue = build_player_queue(available_players)
+        for player in player_queue:
+            player_turn(players,player,current_round,word)
+            
+            
+            
+
+template = get_template()
+menus = get_menus()        
 #display_welcome_message()
 
-#players = get_players()
-#display_players(players,'dash')
-template = get_template()
-menus = get_menus()
 difficulty = set_difficulty()
 words = get_words(difficulty)
-word = get_random_word(words).upper()
-display_word(word, [_ for _ in word], ['A'])
-print(word)
+
+players = get_players()
+display_players(players,'dash')
+
+
+round_controller(players,1)

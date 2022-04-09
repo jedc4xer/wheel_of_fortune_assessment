@@ -5,4 +5,9 @@
   2. Easy
   3. Medium
   4. Hard
+,  ****  Turn Options  ****
+  ------------------------
+  
+  1. Spin the Wheel
+  2. Practice Spin
 ,
