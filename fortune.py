@@ -205,10 +205,14 @@ def get_players():
         }
     }
     
+    os.system(clear_term)
+    
     # User Name Input Loop
     passed = 0
     while passed < 3:
         for player in players.keys():
+            print(template[3])
+            print("  ** GAME SETUP **  ".center(78," "))
             display_players(players,'name')
             if players[player]['name'] == None:
                 player_name = input(f"  Please enter the name of {player}: >> ").strip()
@@ -241,10 +245,6 @@ def get_spin_result(layout):
     result = random.choice(layout)
     if result == ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT'):  
         result = random.choice(result)
-        if result != 'BANKRUPT':
-            return result
-        else:
-            return result
     return result
 
 def test_spinner(layout):
