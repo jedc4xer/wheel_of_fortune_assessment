@@ -23,7 +23,8 @@ def get_template():
 
 def get_menus():
     path = 'https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/menus.txt'
-    template = get_files(path.split(","))
+    menus = get_files(path).split(",")
+    return menus
 
 def get_words(difficulty):
     path = "https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
@@ -117,7 +118,7 @@ def display_players(players, detail):
         print('\n')
             
 def set_difficulty():
-    print(template[4])
+    print(menus[0])
     passed = False
     while not passed:
         difficulty = input("  Game Difficulty: >> ")
@@ -177,6 +178,7 @@ def get_players():
 #players = get_players()
 #display_players(players,'dash')
 template = get_template()
+menus = get_menus()
 difficulty = set_difficulty()
 words = get_words(difficulty)
 word = get_random_word(words)

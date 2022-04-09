@@ -1,6 +1,8 @@
   ** Difficulty Options **
   ------------------------
-  1. Basic Assessment
+  
+  1. Basic (Assessment)
   2. Easy
   3. Medium
   4. Hard
+,
