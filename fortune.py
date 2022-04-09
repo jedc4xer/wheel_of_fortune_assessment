@@ -13,8 +13,15 @@ def get_wheels():
     ).text.split(",")
     return wheels
 
-wheels = get_wheels()
-for wheel in wheels:
-    print(wheel)
-    time.sleep(1)
-    os.system(clear_term)
+def display_wheels(wheel_selection):
+    wheels = get_wheels()[:-1]
+
+    dw = 0 # dw is 'displayed_wheel'
+    for increment in range(1, 100, 5):
+        wheel = wheels[dw]
+        print(wheel)
+        time.sleep(0.02 + increment/100)
+        os.system(clear_term)
+        dw = 0 if dw + 1 >= len(wheels) else dw + 1
+
+def display_welcome_message():
