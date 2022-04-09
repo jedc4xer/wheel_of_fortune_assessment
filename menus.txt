@@ -1,4 +1,4 @@
-,  ** Difficulty Options **
+  ** Difficulty Options **
   ------------------------
   1. Basic Assessment
   2. Easy

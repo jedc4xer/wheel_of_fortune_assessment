@@ -22,7 +22,7 @@ def get_template():
     return template
 
 def get_menus():
-    path = ''
+    path = 'https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/menus.txt'
     template = get_files(path.split(","))
 
 def get_words(difficulty):
@@ -129,13 +129,28 @@ def get_players():
     
     players = {
         'Player 1': {
-            'name': None, 'bank': 0, 'stash': 0, 'guesses': 0, 'correct': 0
+            'name': None,
+            'bank': 0,
+            'stash': 0,
+            'guesses': 0,
+            'correct': 0,
+            'status': None
         }, 
         'Player 2': {
-            'name': None, 'bank': 0, 'stash': 0, 'guesses': 0, 'correct': 0
+            'name': None,
+            'bank': 0,
+            'stash': 0,
+            'guesses': 0,
+            'correct': 0,
+            'status': None
         }, 
         'Player 3': {
-            'name': None, 'bank': 0, 'stash': 0, 'guesses': 0, 'correct': 0
+            'name': None,
+            'bank': 0,
+            'stash': 0,
+            'guesses': 0,
+            'correct': 0,
+            'status': None
         }
     }
     
@@ -149,6 +164,7 @@ def get_players():
                 valid_name = check_input(player_name,'name',50)
                 if valid_name:
                     players[player]['name'] = player_name.upper()
+                    players[player]['status'] = 'Available'
                     passed += 1
             os.system(clear_term)
     return players
