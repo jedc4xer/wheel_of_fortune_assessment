@@ -51,8 +51,4 @@ Wheel:
     5. One Segment is jackpot
     6. One Segment is million dollars
     7. One Segment is mystery
-    
-    Questions:
-        is 26 segments okay due to million dollar version?
-        there is discrepancy in assessment terminology over whether to use counter or guess for final round.
-        Is black okay?
+   
