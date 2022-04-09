@@ -272,6 +272,19 @@ def player_turn(players,player,current_round,word):
     display_turn_info(players[player],current_round)
     print(menus[1])
     
+    choices = {
+        '1': get_spin_result(layout),
+        '2': test_spinner(layout),
+        '3': raise SystemExit
+    }
+    
+    num_options = 3
+    passed = False
+    while not passed:
+        choice = input("  Choose an action: >> ")
+        passed = check_input(choice,'number',num_options)
+    choice = choices[choice]
+    
     
 def round_controller(players, current_round):
     word = get_random_word(words).upper()
