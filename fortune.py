@@ -131,7 +131,7 @@ def display_welcome_message():
 
 def check_input(input_str,type_requirement,limits):
     
-    # If the input requires a name
+    # This block of logic is checking general gamepay inputs. 
     if type_requirement == 'name':
         cleaned = [_ for _ in input_str if (_ == " " or _.isalpha())]
         if (len(input_str) == len(cleaned) and len(input_str) <= limits):
@@ -141,7 +141,36 @@ def check_input(input_str,type_requirement,limits):
             if int(input_str) in range(limits + 1):
                 return True
             
-    print(f'  {input_str} is not a valid {type_requirement}.')
+    # This block of logic is specifically for checking the input of guesses. 
+    elif type(type_requirement) == list:
+        vowels = ['A','E','I','O','U']
+        consonants = [_ for _ in string.ascii_uppercase if _ not in vowels]
+        cleaned = "".join(_.upper() for _ in input_str if _.isalpha())
+        
+        if (len(input_str) == len(cleaned) and len(input_str) <= limits):
+            input_str = cleaned
+            if type_requirement == ['word','consonant']:
+                if len(input_str) == 1:
+                    if input_str in consonants:
+                        return True
+                else:
+                    return True
+            elif type_requirement == ['word','vowel']:
+                if len(input_str) == 1:
+                    if input_str in vowels:
+                        return True
+                else:
+                    return True
+            elif type_requirement == ['consonant','vowel']:
+                if (
+                    len("".join(_ for _ in input_str if _ in vowels)) <= 1 and
+                    len("".join(_ for _ in input_str if _ in consonants)) <= 3
+                ):
+                    return True
+                else:
+                    type_requirements = "collection of letters as specified"
+                
+    print(f'\n  {input_str} is not a valid {type_requirement}.')
     time.sleep(2)
     return False
 
@@ -238,13 +267,14 @@ def get_players():
             os.system(clear_term)
     return players
 
-def establish_wheel_layout():
+def establish_wheel_layout(current_round):
     money_prizes = [_ for _ in range(100,950,50)]
-    spare = [random.randrange(1000,5000,500)]
+    #spare = [random.randrange(1000,5000,500)] # Option removed due to rubric
+    spare = [500,900] if current_round == 1 else [500,'JACKPOT']
     money_prizes += spare
     millions = ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT')
     layout = [
-        millions,'AVAILABLE','AVAILABLE','AVAILABLE','JACKPOT','AVAILABLE',
+        millions,'AVAILABLE','AVAILABLE','AVAILABLE','AVAILABLE','AVAILABLE',
         'AVAILABLE','AVAILABLE','MYSTERY','AVAILABLE','AVAILABLE','AVAILABLE',
         'BANKRUPT','AVAILABLE','AVAILABLE','AVAILABLE','BANKRUPT','AVAILABLE',
         'AVAILABLE','AVAILABLE','AVAILABLE','LOSE A TURN','AVAILABLE','AVAILABLE'
@@ -259,6 +289,8 @@ def get_spin_result(layout):
     result = random.choice(layout)
     if result == ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT'):  
         result = random.choice(result)
+    elif result == 'MYSTERY':
+        result = random.choice(['BANKRUPT','MYSTERY 1000'])
     return result
 
 def test_spinner(layout):
@@ -280,104 +312,163 @@ def build_player_queue(play):
     ]
     return player_queue
 
-def spin_result_logic(players,player,spin):
-    """ This function holds the logic for what to do with a spin. """
-    if spin == 'BANKRUPT':
-        print('You are bankrupt.')
-        players[player]['stash'] = 0
-        players[player]['jackpot'] = 0
-        spin_result = 'BANKRUPT'
-    elif spin == 'LOSE A TURN':
-        print('You lost a turn.')
-        spin_result = 'LOST TURN'
-    elif spin == 'JACKPOT':
-        """
-        JACKPOT is a very difficult one to reason out. My interpretation is
-        that if a player lands on jackpot, then the jackpot starts growing at
-        5000 and accumulates additional based on every following player's
-        wheelspins. The player that lands on jackpot can win the jackpot by 
-        guessing the answer during their turn, and if their turn ends, they
-        will need to wait for their following turn to attempt a guess. Any 
-        number of players can land on jackpot, and the winner will be the one
-        who correctly answers. If they land on jackpot on more than one turn, 
-        they get an additional 5000.
-        """
-        print('You hit the jackpot.')
-        players[player]['jackpot'] += 5000
-        spin_result = 'JACKPOT'
-    elif spin == 'MYSTERY':
-        print('You landed on mystery.')
-        mystery_revealed = random.choice([1,2])
-        if mystery_revealed == 1:
-            spin_result = 'MYSTERY 1000'
-            players[player]['stash'] += 1000
-        if mystery_revealed == 2:
-            spin_result = 'MYSTERY BANKRUPT'
-            players[player]['stash'] = 0
-            players[player]['jackpot'] = 0
+# def spin_result_logic(players,player,spin):
+#     """ This function holds the logic for what to do with a spin. """
+#     if spin == 'BANKRUPT':
+#         players[player]['stash'] = 0
+#         players[player]['jackpot'] = 0
+#         spin_result = 'BANKRUPT'
+#     elif spin == 'LOSE A TURN':
+#         spin_result = 'LOST TURN'
+#     elif spin == 'JACKPOT':
+#         """
+#         JACKPOT is a very difficult one to reason out. My interpretation is
+#         that if a player lands on jackpot, then the jackpot starts growing at
+#         5000 and accumulates additional based on every following player's
+#         wheelspins. The player that lands on jackpot can win the jackpot by 
+#         guessing the answer during their turn, and if their turn ends, they
+#         will need to wait for their following turn to attempt a guess. Any 
+#         number of players can land on jackpot, and the winner will be the one
+#         who correctly answers. If they land on jackpot on more than one turn, 
+#         they get an additional 5000.
+#         """
+#         players[player]['jackpot'] += 5000
+#         spin_result = 'JACKPOT'
+#     elif spin == 'MYSTERY':
+#         mystery_revealed = random.choice([1,2])
+#         if mystery_revealed == 1:
+#             spin_result = '1000'
+#             players[player]['stash'] += 1000
+#         if mystery_revealed == 2:
+#             spin_result = 'BANKRUPT'
+#             players[player]['stash'] = 0
+#             players[player]['jackpot'] = 0
             
-    elif spin == 'ONE MILLION DOLLARS':
-        print('One Million Dollars.')
-        players[player]['stash'] += 1000000
-    else:
-        players[player]['stash'] += int(spin)
-        
-        # Add earnings to the stash of any jackpot players.
-        for key in players.keys():
-            if players[key]['jackpot'] > 0:
-                players[key]['jackpot'] += int(spin)
+#     elif spin == 'ONE MILLION DOLLARS':
+#         players[player]['stash'] += 1000000
+#         spin_result = "ONE MILLION"
+#     else:
+#         players[player]['stash'] += int(spin)
+#         spin_result = 'MONEY WEDGE'
+#         # Add earnings to the stash of any jackpot players.
+#         for key in players.keys():
+#             if players[key]['jackpot'] > 0:
+#                 players[key]['jackpot'] += int(spin)
+#     return players, spin_result
 
-
-def player_turn(players,player,current_round,word,layout,not_spun):
-    """ This function contains all the actions for each player turn. """
-    os.system(clear_term)
-    print(template[3])
-    display_turn_info(players[player],current_round)
-    print(menus[1])
+def take_guess(word, guessed_letters, allowed):
+    """ This function validates and manages a player guess. """
     
-    print(players)
-    # choices = {
-    #     '1': get_spin_result,
-    #     '2': test_spinner,
-    #     '3': quick_exit
-    # }
-    
-    num_options = 3
     passed = False
     while not passed:
-        choice = input("  Choose an action: >> ")
-        passed = check_input(choice,'number',num_options)
-    #var = layout if choice != '3' else None
-    # choice = choices[choice](var)
-    if choice == '1':
-        spin = get_spin_result(layout)
-        spin_result_logic(players,player,spin)
-        time.sleep(2)
-        not_spun = False
-    elif choice == '2':
-        if not_spun:
-            print('  The results will be viewable for 10 seconds.')
-            time.sleep(2)
-            test_spinner(layout)
-            time.sleep(10)
-            player_turn(players,player,current_round,word,layout,True)
+        player_guess = input(f"  Guess a {allowed[0]} or {allowed[1]}: >> ")
+        passed = check_input(player_guess, allowed, 100)
+    
+    # If the allowed inputs are not the group of 3 consonants and 1 vowel. 
+    player_guess = player_guess.upper()
+    attempted_word = False
+    if allowed != ['consonant','vowel']:
+        if len(player_guess) > 1:
+            attempted_word = True
+            if player_guess == word:
+                turn_result = 'WON ROUND'
+            else: 
+                turn_result = 'LOST TURN'
+        else:
+            if player_guess in word:
+                turn_result = 'GOOD GUESS'
+            else:
+                turn_result = 'BAD GUESS'
     else:
-        quick_exit()
+        turn_result = 'FREE GUESSES'
+             
+    display_word(word, guessed_letters, player_guess)
     
+    correct_guesses = 0
+    total_guesses = 0
+    if not attempted_word:
+        for letter in player_guess:
+            guessed_letters.append(letter)
+            if letter in word:
+                correct_guesses += 1
+            total_guesses += 1
+    else:
+        if turn_result == 'WON ROUND':
+            correct_guesses = 1
+        total_guesses = 1
+        
+    # List of variables being sent to parent function.
+    return_list = [
+        correct_guesses,
+        total_guesses,
+        guessed_letters,
+        turn_result
+    ]
     
-            
-            
+    return return_list
+             
+    
+def manage_bank(players,player,task):
+    """ This function contols the monetary transactions. """
+    if task == 'BANKRUPT':
+        players[player]['stash'] = 0
+    elif task == 'WON ROUND':
+        players[player]['bank'] += players[player]['stash']
+        players[player]['stash'] = 0
+    return players
+    
+def player_turn(players,player,current_round,word,layout,guessed_letters):
+    """ This function contains all the actions for each player turn. """
+    
+    outer_passed = False
+    while not outer_passed:
+        os.system(clear_term)
+        print(template[3])
+        display_turn_info(players[player],current_round)
+        print(menus[1])
+
+        num_options = 3
+        passed = False
+        while not passed:
+            choice = input("  Choose an action: >> ")
+            passed = check_input(choice,'number',num_options)
+
+        if choice == '1':
+            spin = get_spin_result(layout)
+            #players, spin_result = spin_result_logic(players,player,spin)
+            if spin in ['BANKRUPT','LOSE A TURN']:
+                if spin == 'BANKRUPT':
+                    players = manage_bank(players,player,'BANKRUPT')
+                return players
+            else:
+                allowed = ['word','consonant']
+                guess_result = take_guess(word, guessed_letters, allowed)
+                if guess_result[3] == 'LOST TURN':
+                    players = manage_bank(players,player,'BANKRUPT')
+                elif guess_result[3] == 'WON ROUND':
+                    players = manage_bank(players,player,'WON ROUND')
+            display_turn_info(players[player],current_round)
+
+        elif choice == '2':
+            if not_spun:
+                print('  The results will be viewable for 10 seconds.')
+                time.sleep(2)
+                test_spinner(layout)
+                time.sleep(10)
+        else:
+            quick_exit()
     
     
 def round_controller(players, current_round):
     word = get_random_word(words).upper()
-    layout = establish_wheel_layout()
-    display_word(word, [_ for _ in word], ['A'])
+    guessed_letters = []
+    layout = establish_wheel_layout(current_round)
+    display_word(word, guessed_letters, [])
     if current_round < 3:
         available_players = [_ for _ in players.keys()]
-        player_queue = build_player_queue(available_players)
+        player_queue = build_player_queue(available_players) * 10
         for player in player_queue:
-            players = player_turn(players,player,current_round,word,layout,True)
+            players = player_turn(players,player,current_round,word,layout,guessed_letters)
             
             
             
