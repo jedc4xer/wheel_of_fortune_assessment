@@ -102,18 +102,7 @@ def display_word(word, guessed_letters, new_guess):
     os.system(clear_term)
     print(template[3])
     print(revealed.center(78," "))
-        
-        
-def display_wheels(wheel_selection):
-    wheels = get_wheels()[:-1]
 
-    dw = 0 # dw is 'displayed_wheel'
-    for increment in range(1, 100, 5):
-        os.system(clear_term)
-        wheel = wheels[dw]
-        print(wheel)
-        time.sleep(0.02 + increment/100)  
-        dw = 0 if dw + 1 >= len(wheels) else dw + 1
 
 def display_welcome_message():
     
@@ -290,7 +279,7 @@ def get_spin_result(layout):
     if result == ('BANKRUPT','ONE MILLION DOLLARS','BANKRUPT'):  
         result = random.choice(result)
     elif result == 'MYSTERY':
-        result = random.choice(['BANKRUPT','MYSTERY 1000'])
+        result = random.choice(['MYSTERY BANKRUPT','MYSTERY 1000'])
     return result
 
 def test_spinner(layout):
@@ -373,10 +362,48 @@ def manage_bank(players,player,task):
         players[player]['bank'] += players[player]['stash']
         players[player]['stash'] = 0
     return players
+
+def wheel_flash(wheel,segment):
+    segment = str(segment)
+    os.system(clear_term)
+    print(wheel)
+    print(segment.center(78,' '))
+
+def display_wheels(spin,layout):
+    wheels = get_wheels()[:-1]
+
+    dw = 0 # dw is 'displayed_wheel'
+    layout_increment = 0
+    displayed_layout = [_ for _ in layout[1:]]
+    displayed_layout += ['BANKRUPT','ONE MILLION DOLLARS','BANKRUPT']
+    displayed_layout *= 20
+    for increment in range(1, 510, 10):
+        wheel = wheels[dw]
+        if increment > 450:
+            segment = '???? WHAT IS IT GOING TO BE ????'
+        else: 
+            segment = displayed_layout[layout_increment]
+        wheel_flash(wheel,segment)
+        time.sleep(0.01 + increment/500)
+        dw = 0 if dw + 1 >= len(wheels) else dw + 1
+        layout_increment += 1
+    if (spin == 'MYSTERY 1000' or spin == 'MYSTERY BANKRUPT'):
+        segment == 'MYSTERY'
+    else:
+        segment = spin
+        
+    if segment == 'MYSTERY':
+        print('REVEALING THE MYSTERY'.center(78,' '))
+        time.sleep(2)
+        wheel_flash(wheel,spin)
+    else:
+        wheel_flash(wheel,segment)
+    time.sleep(2)
     
 def player_turn(players,player,current_round,word,layout,guessed_letters):
     """ This function contains all the actions for each player turn. """
     
+    not_spun = True
     outer_passed = False
     while not outer_passed:
         os.system(clear_term)
@@ -392,9 +419,15 @@ def player_turn(players,player,current_round,word,layout,guessed_letters):
 
         if choice == '1':
             spin = get_spin_result(layout)
-            # need to display the spin results
-            ##################################
-            if spin in ['BANKRUPT','LOSE A TURN']:
+            display_wheels(spin,layout)
+            os.system(clear_term)
+            print(template[3])
+            if str(spin).isnumeric():
+                spin = "$" + str(spin)
+            print(f'  Possible Earnings: {spin}')
+            display_turn_info(players[player],current_round)
+            not_spun = False
+            if spin in ['BANKRUPT','LOSE A TURN','MYSTERY BANKRUPT']:
                 if spin == 'BANKRUPT':
                     players = manage_bank(players,player,'BANKRUPT')
                 return players
