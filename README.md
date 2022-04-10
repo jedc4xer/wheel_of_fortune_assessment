@@ -52,3 +52,15 @@ Wheel:
     6. One Segment is million dollars
     7. One Segment is mystery
    
+   
+   """
+#         JACKPOT is a very difficult one to reason out. My interpretation is
+#         that if a player lands on jackpot, then the jackpot starts growing at
+#         5000 and accumulates additional based on every following player's
+#         wheelspins. The player that lands on jackpot can win the jackpot by 
+#         guessing the answer during their turn, and if their turn ends, they
+#         will need to wait for their following turn to attempt a guess. Any 
+#         number of players can land on jackpot, and the winner will be the one
+#         who correctly answers. If they land on jackpot on more than one turn, 
+#         they get an additional 5000.
+#         """

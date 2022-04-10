@@ -312,49 +312,6 @@ def build_player_queue(play):
     ]
     return player_queue
 
-# def spin_result_logic(players,player,spin):
-#     """ This function holds the logic for what to do with a spin. """
-#     if spin == 'BANKRUPT':
-#         players[player]['stash'] = 0
-#         players[player]['jackpot'] = 0
-#         spin_result = 'BANKRUPT'
-#     elif spin == 'LOSE A TURN':
-#         spin_result = 'LOST TURN'
-#     elif spin == 'JACKPOT':
-#         """
-#         JACKPOT is a very difficult one to reason out. My interpretation is
-#         that if a player lands on jackpot, then the jackpot starts growing at
-#         5000 and accumulates additional based on every following player's
-#         wheelspins. The player that lands on jackpot can win the jackpot by 
-#         guessing the answer during their turn, and if their turn ends, they
-#         will need to wait for their following turn to attempt a guess. Any 
-#         number of players can land on jackpot, and the winner will be the one
-#         who correctly answers. If they land on jackpot on more than one turn, 
-#         they get an additional 5000.
-#         """
-#         players[player]['jackpot'] += 5000
-#         spin_result = 'JACKPOT'
-#     elif spin == 'MYSTERY':
-#         mystery_revealed = random.choice([1,2])
-#         if mystery_revealed == 1:
-#             spin_result = '1000'
-#             players[player]['stash'] += 1000
-#         if mystery_revealed == 2:
-#             spin_result = 'BANKRUPT'
-#             players[player]['stash'] = 0
-#             players[player]['jackpot'] = 0
-            
-#     elif spin == 'ONE MILLION DOLLARS':
-#         players[player]['stash'] += 1000000
-#         spin_result = "ONE MILLION"
-#     else:
-#         players[player]['stash'] += int(spin)
-#         spin_result = 'MONEY WEDGE'
-#         # Add earnings to the stash of any jackpot players.
-#         for key in players.keys():
-#             if players[key]['jackpot'] > 0:
-#                 players[key]['jackpot'] += int(spin)
-#     return players, spin_result
 
 def take_guess(word, guessed_letters, allowed):
     """ This function validates and manages a player guess. """
@@ -435,7 +392,8 @@ def player_turn(players,player,current_round,word,layout,guessed_letters):
 
         if choice == '1':
             spin = get_spin_result(layout)
-            #players, spin_result = spin_result_logic(players,player,spin)
+            # need to display the spin results
+            ##################################
             if spin in ['BANKRUPT','LOSE A TURN']:
                 if spin == 'BANKRUPT':
                     players = manage_bank(players,player,'BANKRUPT')
