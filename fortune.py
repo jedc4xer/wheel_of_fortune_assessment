@@ -26,8 +26,8 @@ def quick_exit():
 
 def pause_run(duration):
     """ This function allows me to quickly test without constantly pausing. """
-    # time.sleep(duration)
-    print("Time Paused")  # Remove Comment if disabling pause
+    time.sleep(duration)
+    #print("Time Paused")  # Remove Comment if disabling pause
 
 
 def clean_screen():
@@ -295,7 +295,7 @@ def get_players():
         },
         "Player 2": {
             "name": None,
-            "bank": 1000,
+            "bank": 0,
             "stash": 0,
             "guesses": 0,
             "correct": 0,
@@ -509,7 +509,7 @@ def player_turn(players, player, current_round, word, layout, guessed_letters, f
         if choice == "1":
             if not spun:
                 spin = get_spin_result(layout)
-                #display_wheels(spin,layout) # remove comment to activate spinning
+                display_wheels(spin,layout) # remove comment to activate spinning
 
                 if spin == "MYSTERY 1000":
                     spin = 1000
@@ -607,8 +607,9 @@ def round_controller(players, current_round):
             if player not in player_queue:
                 print(f" ** {players[player]['name']} Eliminated ** ".center(78," "))
                 print("")
-                pause_run(1)
-        
+                pause_run(1)    
+    else:
+        final_prize = None
         
     for player in player_queue:
         starting_bank = players[player]["bank"]
@@ -640,5 +641,5 @@ players = get_players()
 display_players(players, "dash")
 
 # [1, 2, 3]
-for round_ in [3]:
+for round_ in [1,2,3]:
     round_controller(players, round_)
