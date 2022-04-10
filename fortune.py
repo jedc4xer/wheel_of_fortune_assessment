@@ -8,6 +8,8 @@ from collections import Counter
 # Assign system flexible clear variable
 clear_term = "cls||clear"
 
+# Collection for User Params
+user_params = []
 
 def quick_exit():
     print("\n\n  Taking the walk of shame I see! Was it too difficult?")
@@ -23,12 +25,10 @@ def quick_exit():
     print("\n  The exit is over there... \n")
     raise SystemExit
 
-
+# Pause Function
 def pause_run(duration):
-    """ This function allows me to quickly test without constantly pausing. """
-    time.sleep(duration)
-    #print("Time Paused")  # Remove Comment if disabling pause
-
+    if "*" not in user_params:
+        time.sleep(duration)
 
 def clean_screen():
     os.system(clear_term)
@@ -187,6 +187,7 @@ def display_welcome_message():
         else:
             print(template[0])
         time.sleep(sleep_duration)
+    clean_screen()
     print(template[2])
 
 
@@ -269,17 +270,20 @@ def display_turn_info(player, current_round):
     print(f"  Player Name: {name}\n  Round Stash: ${stash}\n  Total Bank: ${bank}")
 
 
+# This function allows the user to adjust the difficulty of the game.
 def set_difficulty():
     print(menus[0])
     passed = False
     while not passed:
         difficulty = input("  Game Difficulty: >> ")
+        if "*" in difficulty:
+            user_params.append("*")
+            difficulty = difficulty.replace("*","")
         passed = check_input(difficulty, "number", 4)
     difficulty = {"1": "basic assessment", "2": "easy", "3": "medium", "4": "hard"}[
         difficulty
     ]
     return difficulty
-
 
 def get_players():
 
@@ -304,7 +308,7 @@ def get_players():
         },
         "Player 3": {
             "name": None,
-            "bank": 0,
+            "bank": 4000,
             "stash": 0,
             "guesses": 0,
             "correct": 0,
@@ -340,7 +344,8 @@ def get_players():
 def establish_wheel_layout(current_round):
     money_prizes = [_ for _ in range(100, 950, 50)]
     # spare = [random.randrange(1000,5000,500)] # Option removed due to rubric
-    spare = [500, 900] if current_round == 1 else [500, "JACKPOT"]
+    #spare = [500, 900] if current_round == 1 else [500, "JACKPOT"]
+    spare = [500,900] # Removed JACKPOT option due to confusion about rules
     money_prizes += spare
     millions = ("BANKRUPT", "ONE MILLION DOLLARS", "BANKRUPT")
     layout = [
@@ -395,12 +400,16 @@ def take_guess(word, guessed_letters, allowed):
 
     passed = False
     while not passed:
-        if "vowel" in allowed:
+        if allowed == ['word','vowel']:
             print('\n  You have the opportunity to "Buy a Vowel" for $250.')
         elif "end turn" in allowed:
             print("\n  You do not have enough money to buy a vowel.")
             print('  To end your turn, type "end turn".')
-        player_guess = input(f"  Guess the {allowed[0]} or {allowed[1]}: >> ")
+        if allowed == ['consonant','vowel']:
+            print_str = '  Input your guess of up to 3 consonants and 1 vowel: >> '
+        else:
+            print_str = f'  Guess the {allowed[0]} or {allowed[1]}: >> '
+        player_guess = input(f"{print_str}")
         if player_guess.lower() == "end turn":
             return "TURN ENDED"
 
@@ -445,6 +454,9 @@ def take_guess(word, guessed_letters, allowed):
             if letter in word:
                 correct_guesses += 1
             total_guesses += 1
+        word_check = len("".join(_ for _ in word if _ in guessed_letters))
+        if word_check == len(word):
+            turn_result == "WON ROUND"
     else:
         if turn_result == "WON ROUND":
             correct_guesses = 1
@@ -509,7 +521,7 @@ def player_turn(players, player, current_round, word, layout, guessed_letters, f
         if choice == "1":
             if not spun:
                 spin = get_spin_result(layout)
-                display_wheels(spin,layout) # remove comment to activate spinning
+                #display_wheels(spin,layout) # Comment out to deactivate spinning
 
                 if spin == "MYSTERY 1000":
                     spin = 1000
@@ -541,8 +553,20 @@ def player_turn(players, player, current_round, word, layout, guessed_letters, f
                         allowed = ["word", "vowel"]
                 else:
                     allowed = ["word", "consonant"]
+                
+                if current_round > 2:
+                    allowed = ['consonant','vowel']
 
                 guess_result = take_guess(word, guessed_letters, allowed)
+                players[player]['correct'] += guess_result[0]
+                players[player]['guesses'] += guess_result[1]
+                
+                if current_round > 2:
+                    allowed = ["word", "end turn"]
+                    guess_result = take_guess(word, guessed_letters, allowed)
+                    players[player]['correct'] += guess_result[0]
+                    players[player]['guesses'] += guess_result[1]
+                
 
                 if guess_result in ["TURN ENDED", "LOST TURN"]:
                     return players
@@ -601,6 +625,7 @@ def round_controller(players, current_round):
     player_queue = build_player_queue(available_players) * 50
     
     if current_round > 2:
+        guessed_letters = ['R','S','T','L','N','E']
         final_prize = random.randrange(10000,100000,5000)
         player_queue = [get_final_player(players)]
         for player in players.keys():
@@ -617,7 +642,12 @@ def round_controller(players, current_round):
             players, player, current_round, word, layout, guessed_letters, final_prize
         )
         if players[player]["bank"] == starting_bank:
-            print("\n  Next Player...")
+            if current_round > 2:
+                print(f"\n  Oops! At least you got ${starting_bank}")
+                print("\n\n   The correct word was...\n\n")
+                print(word.center(78," "))
+            else:
+                print("\n  Next Player...")
         else:
             print("\n  ***** WE HAVE A WINNER!!!! ***** \n")
             print("  Starting Next Round...\n")
@@ -625,14 +655,15 @@ def round_controller(players, current_round):
             # Update all players banks.
             for player in players.keys():
                 players[player]["bank"] += players[player]["stash"]
+                players[player]['stash'] = 0
 
             return players
-        # time.sleep(3)
+        time.sleep(3)
 
 
 template = get_template()
 menus = get_menus()
-# display_welcome_message()
+#display_welcome_message()
 
 difficulty = set_difficulty()
 words = get_words(difficulty)
@@ -641,5 +672,5 @@ players = get_players()
 display_players(players, "dash")
 
 # [1, 2, 3]
-for round_ in [1,2,3]:
+for round_ in [3]:
     round_controller(players, round_)
