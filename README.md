@@ -1,6 +1,12 @@
 # wheel_of_fortune_assessment
 Repository for holding files relating to the Wheel of Fortune Python Assessment
 
+My Interpretation of this game is based on the game description in the assessment as well 
+as the results of any research I did to fill in the gaps. 
+
+The game description in the assessment was, at best, unclear/presumptive/conflicting/incomplete, so
+there are matching irregularities or inconsistencies in my coded interpretation. 
+
 Goal:
     Make as much money as possible while guessing letters that make up a word or phrase that fall under a 
     specific category. 

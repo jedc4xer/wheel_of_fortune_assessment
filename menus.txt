@@ -18,3 +18,9 @@
   
   1. Take a Guess (word or consonant)
   2. Walk of Shame (Exit)
+,
+****  Turn Options  ****
+  ------------------------
+  
+  1. Take a Guess (word or vowel)
+  2. End Turn
