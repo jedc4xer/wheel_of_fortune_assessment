@@ -6,21 +6,17 @@
   3. Medium
   4. Hard
 ,
-****  Turn Options  ****
+  ****  Turn Options  ****
   ------------------------
   
   1. Spin the Wheel
   2. Practice Spin
   3. Walk of Shame (Exit)
 ,
-****  Turn Options  ****
+  ****  Turn Options  ****
   ------------------------
   
-  1. Take a Guess (word or consonant)
-  2. Walk of Shame (Exit)
-,
-****  Turn Options  ****
-  ------------------------
-  
-  1. Take a Guess (word or vowel)
+  1. Take a Guess
   2. End Turn
+  3. Walk of Shame (Exit)
+,

@@ -103,7 +103,43 @@ def display_word(word, guessed_letters, new_guess):
     print(template[3])
     print(revealed.center(78," "))
 
+def wheel_flash(wheel,segment):
+    segment = str(segment)
+    os.system(clear_term)
+    print(wheel)
+    print(segment.center(78,' '))
 
+def display_wheels(spin,layout):
+    wheels = get_wheels()[:-1]
+
+    dw = 0 # dw is 'displayed_wheel'
+    layout_increment = 0
+    displayed_layout = [_ for _ in layout[1:]]
+    displayed_layout += ['BANKRUPT','ONE MILLION DOLLARS','BANKRUPT']
+    displayed_layout *= 20
+    for increment in range(1, 510, 10):
+        wheel = wheels[dw]
+        if increment > 450:
+            segment = '???? WHAT IS IT GOING TO BE ????'
+        else: 
+            segment = displayed_layout[layout_increment]
+        wheel_flash(wheel,segment)
+        time.sleep(0.01 + increment/500)
+        dw = 0 if dw + 1 >= len(wheels) else dw + 1
+        layout_increment += 1
+    if (spin == 'MYSTERY 1000' or spin == 'MYSTERY BANKRUPT'):
+        segment == 'MYSTERY'
+    else:
+        segment = spin
+        
+    if segment == 'MYSTERY':
+        print('REVEALING THE MYSTERY'.center(78,' '))
+        time.sleep(2)
+        wheel_flash(wheel,spin)
+    else:
+        wheel_flash(wheel,segment)
+    time.sleep(2)
+    
 def display_welcome_message():
     
     # Display a flashing welcome message
@@ -254,6 +290,10 @@ def get_players():
                     players[player]['status'] = 'Available'
                     passed += 1
             os.system(clear_term)
+    print(template[3])
+    print("  ** GAME SETUP **  ".center(78," "))
+    display_players(players,'name')
+    ##time.sleep(2) # Remove comment when program is ready
     return players
 
 def establish_wheel_layout(current_round):
@@ -307,7 +347,16 @@ def take_guess(word, guessed_letters, allowed):
     
     passed = False
     while not passed:
+        if vowel in allowed:
+            print('  You now have the opportunity to "Buy a Vowel" for $250.')
+        elif 'exit the game' in allowed:
+            print('  To exit the game, type "exit game".')
         player_guess = input(f"  Guess a {allowed[0]} or {allowed[1]}: >> ")
+        if player_guess.lower() == 'exit game':
+            quick_exit()
+            
+        if allowed == ['word','exit the game']:
+            allowed = 'word'
         passed = check_input(player_guess, allowed, 100)
     
     # If the allowed inputs are not the group of 3 consonants and 1 vowel. 
@@ -321,10 +370,16 @@ def take_guess(word, guessed_letters, allowed):
             else: 
                 turn_result = 'LOST TURN'
         else:
-            if player_guess in word:
-                turn_result = 'GOOD GUESS'
+            if allowed == ['word','consonant']:
+                if player_guess in word:
+                    turn_result = 'GOOD CONS GUESS'
+                else:
+                    turn_result = 'BAD GUESS'
             else:
-                turn_result = 'BAD GUESS'
+                if player_guess in word:
+                    turn_result = 'GOOD VOW GUESS'
+                else:
+                    turn_result = 'BAD GUESS'
     else:
         turn_result = 'FREE GUESSES'
              
@@ -354,62 +409,35 @@ def take_guess(word, guessed_letters, allowed):
     return return_list
              
     
-def manage_bank(players,player,task):
+def manage_bank(players,player,task,earnings):
     """ This function contols the monetary transactions. """
+    
     if task == 'BANKRUPT':
         players[player]['stash'] = 0
     elif task == 'WON ROUND':
+        players[player]['stash'] += earnings
         players[player]['bank'] += players[player]['stash']
         players[player]['stash'] = 0
+    elif task == 'GOOD CONS':
+        players[player]['stash'] += earnings
     return players
 
-def wheel_flash(wheel,segment):
-    segment = str(segment)
-    os.system(clear_term)
-    print(wheel)
-    print(segment.center(78,' '))
 
-def display_wheels(spin,layout):
-    wheels = get_wheels()[:-1]
-
-    dw = 0 # dw is 'displayed_wheel'
-    layout_increment = 0
-    displayed_layout = [_ for _ in layout[1:]]
-    displayed_layout += ['BANKRUPT','ONE MILLION DOLLARS','BANKRUPT']
-    displayed_layout *= 20
-    for increment in range(1, 510, 10):
-        wheel = wheels[dw]
-        if increment > 450:
-            segment = '???? WHAT IS IT GOING TO BE ????'
-        else: 
-            segment = displayed_layout[layout_increment]
-        wheel_flash(wheel,segment)
-        time.sleep(0.01 + increment/500)
-        dw = 0 if dw + 1 >= len(wheels) else dw + 1
-        layout_increment += 1
-    if (spin == 'MYSTERY 1000' or spin == 'MYSTERY BANKRUPT'):
-        segment == 'MYSTERY'
-    else:
-        segment = spin
-        
-    if segment == 'MYSTERY':
-        print('REVEALING THE MYSTERY'.center(78,' '))
-        time.sleep(2)
-        wheel_flash(wheel,spin)
-    else:
-        wheel_flash(wheel,segment)
-    time.sleep(2)
     
 def player_turn(players,player,current_round,word,layout,guessed_letters):
     """ This function contains all the actions for each player turn. """
     
-    not_spun = True
+    spun = False
     outer_passed = False
     while not outer_passed:
+        if spun:
+            menu_to_display = menus[2]
+        else:
+            menu_to_display = menus[1]
         os.system(clear_term)
         print(template[3])
         display_turn_info(players[player],current_round)
-        print(menus[1])
+        print(menu_to_display)
 
         num_options = 3
         passed = False
@@ -419,29 +447,54 @@ def player_turn(players,player,current_round,word,layout,guessed_letters):
 
         if choice == '1':
             spin = get_spin_result(layout)
-            display_wheels(spin,layout)
+            ##display_wheels(spin,layout) # remove comment to activate spinning
+            
+            if spin == 'MYSTERY 1000':
+                spin == 1000
+            elif spin == 'ONE MILLION DOLLARS':
+                spin == 1000000
+             
+            spin_poss = spin
             os.system(clear_term)
             print(template[3])
             if str(spin).isnumeric():
-                spin = "$" + str(spin)
-            print(f'  Possible Earnings: {spin}')
+                spin_poss = "$" + str(spin)
+            print(f'  Possible Earnings: {spin_poss}')
             display_turn_info(players[player],current_round)
-            not_spun = False
+            spun = True
             if spin in ['BANKRUPT','LOSE A TURN','MYSTERY BANKRUPT']:
                 if spin == 'BANKRUPT':
-                    players = manage_bank(players,player,'BANKRUPT')
+                    players = manage_bank(players,player,'BANKRUPT',None)
                 return players
             else:
-                allowed = ['word','consonant']
+                if spun:
+                    if players[player]['stash'] < 250:
+                        allowed = ['word','exit the game']
+                    else:
+                        allowed = ['word','vowel']:
+                else:
+                    allowed = ['word','consonant']
                 guess_result = take_guess(word, guessed_letters, allowed)
+                
                 if guess_result[3] == 'LOST TURN':
-                    players = manage_bank(players,player,'BANKRUPT')
+                    players = manage_bank(players,player,'BANKRUPT',None)
                 elif guess_result[3] == 'WON ROUND':
-                    players = manage_bank(players,player,'WON ROUND')
+                    if str(spin).isnumeric():
+                        earned = spin
+                    else:
+                        earned = None
+                    players = manage_bank(players,player,'WON ROUND',earned)
+                elif guess_result[3] == 'GOOD CONS GUESS':
+                    if str(spin).isnumeric():
+                        players = manage_bank(players,player,'GOOD CONS',spin)
+                elif guess_result[3] == 'BAD GUESS':
+                    players = manage_bank(players,player,'BANKRUPT',None)
             display_turn_info(players[player],current_round)
 
         elif choice == '2':
-            if not_spun:
+            if spun:
+                return players
+            else:
                 print('  The results will be viewable for 10 seconds.')
                 time.sleep(2)
                 test_spinner(layout)
