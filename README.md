@@ -1,18 +1,35 @@
 # wheel_of_fortune_assessment
 Repository for holding files relating to the Wheel of Fortune Python Assessment
 
-My Interpretation of this game is based on the game description in the assessment as well 
-as the results of any research I did to fill in the gaps. 
+Top Level Notes:
 
-The game description in the assessment was, at best, unclear/presumptive/conflicting/incomplete, so
-there are matching irregularities or inconsistencies in my coded interpretation. 
+    My Interpretation of this game is based on the game description in the assessment as well 
+    as the results of any research I did to fill in the gaps. 
 
-Goal:
+    The game description in the assessment was, at best, unclear/presumptive/conflicting/incomplete, so
+    there are matching irregularities or inconsistencies in my coded interpretation. 
+
+Game Goal:
+
     Make as much money as possible while guessing letters that make up a word or phrase that fall under a 
     specific category. 
-    
+   
+General Game Play:
+
     Players Make Money by spinning a wheel. 
-    Section of wheel that they land on determines how much money is received for each consonant guess.
+    
+    The segment of the wheel that they land on, determines their game options.
+    
+Game Rules:
+
+    1. During rounds 1 and 2, the player can spin one time per turn. There is no spin in the final round.
+    2. A player's stash is reset to zero and they lose their turn if they BANKRUPT or guess a consonant or word wrong.
+    3. A player's turn ends if they BANKRUPT, LOSE A TURN, make a wrong guess, or end their turn.
+    4. A player's stash is deposited in their bank if they correctly guess the word and win the round.
+    5. A player's bank is safe and can not diminish.
+    6. A player can only guess a vowel in these conditions: 
+            - correctly guessed a consonant
+            - has at least %$%250 in their stash
     
 Possible Outcomes:
     1. Wheel lands on a number

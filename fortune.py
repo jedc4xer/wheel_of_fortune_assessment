@@ -7,7 +7,7 @@ from collections import Counter
 
 # Assign system flexible clear variable
 clear_term = "cls||clear"
-os.system(clear_term)
+
 
 def quick_exit():
     print("\n\n  Taking the walk of shame I see! Was it too difficult?")
@@ -20,6 +20,16 @@ def quick_exit():
     time.sleep(1)
     print("\n  The exit is over there... \n")
     raise SystemExit
+    
+def pause_run(duration):
+    """ This function allows me to quickly test without constantly pausing. """
+    #time.sleep(duration)
+    print('Time Paused') # Remove Comment if disabling pause
+    
+def clean_screen():
+    os.system(clear_term)
+    
+clean_screen()
     
 def get_files(path):
     return(requests.get(path).text)
@@ -65,31 +75,34 @@ def get_words(difficulty):
 def get_random_word(words):
     return(random.choice(words))
 
-def display_word(word, guessed_letters, new_guess):
-    
-    pre_reveal = ""
-    for char in word:
-        if char in new_guess:
-            pre_reveal += "# "
-        elif char in string.punctuation:
-            pre_reveal += char + " "
-        elif char in guessed_letters:
-            pre_reveal += char + " "
-        else:
-            pre_reveal += '_ '
-    
-    guessed_letters += new_guess
- 
-    # Slow the reveal
-    revealing = ""
-    for char in pre_reveal:
-        os.system(clear_term)
-        print(template[3])
-        revealing += char
-        print(revealing.center(78," "))
-        time.sleep(0.2)
-        
-    time.sleep(2)
+def display_word(word, guessed_letters, new_guess, sudden):
+    """ This function displays the word and populates it with any new guesses. """
+    if not sudden:
+        pre_reveal = ""
+        for char in word:
+            if char in new_guess:
+                pre_reveal += "# "
+            elif char in string.punctuation:
+                pre_reveal += char + " "
+            elif char in guessed_letters:
+                pre_reveal += char + " "
+            else:
+                pre_reveal += '_ '
+
+        guessed_letters += new_guess
+
+        # Slow the reveal
+        revealing = ""
+        for char in pre_reveal:
+            clean_screen()
+            print(template[3])
+            revealing += char
+            print(revealing.center(78," "))
+            #time.sleep(0.2)
+            pause_run(0.2)
+
+        #time.sleep(2)
+        pause_run(0.2)
     
     revealed = "  "
     for char in word:
@@ -99,13 +112,14 @@ def display_word(word, guessed_letters, new_guess):
             revealed += char + " "
         else:
             revealed += "_" + " "
-    os.system(clear_term)
+    clean_screen()
     print(template[3])
     print(revealed.center(78," "))
+    print('')
 
 def wheel_flash(wheel,segment):
     segment = str(segment)
-    os.system(clear_term)
+    clean_screen()
     print(wheel)
     print(segment.center(78,' '))
 
@@ -145,7 +159,7 @@ def display_welcome_message():
     # Display a flashing welcome message
     sleep_duration = 2
     for inc in range(20):
-        os.system(clear_term)
+        clean_screen()
         if inc > 1:
             sleep_duration = 0.2
             print(template[(inc % 2) + 1])
@@ -156,8 +170,8 @@ def display_welcome_message():
 
 def check_input(input_str,type_requirement,limits):
     
-    # This block of logic is checking general gamepay inputs. 
-    if type_requirement == 'name':
+    # This block of logic is checking general gameplay inputs. 
+    if type_requirement in ['name','word']:
         cleaned = [_ for _ in input_str if (_ == " " or _.isalpha())]
         if (len(input_str) == len(cleaned) and len(input_str) <= limits):
             return True
@@ -194,7 +208,7 @@ def check_input(input_str,type_requirement,limits):
                     return True
                 else:
                     type_requirements = "collection of letters as specified"
-                
+    
     print(f'\n  {input_str} is not a valid {type_requirement}.')
     time.sleep(2)
     return False
@@ -273,7 +287,7 @@ def get_players():
         }
     }
     
-    os.system(clear_term)
+    clean_screen()
     
     # User Name Input Loop
     passed = 0
@@ -289,7 +303,7 @@ def get_players():
                     players[player]['name'] = player_name.upper()
                     players[player]['status'] = 'Available'
                     passed += 1
-            os.system(clear_term)
+            clean_screen()
     print(template[3])
     print("  ** GAME SETUP **  ".center(78," "))
     display_players(players,'name')
@@ -344,20 +358,23 @@ def build_player_queue(play):
 
 def take_guess(word, guessed_letters, allowed):
     """ This function validates and manages a player guess. """
-    
+        
     passed = False
     while not passed:
-        if vowel in allowed:
-            print('  You now have the opportunity to "Buy a Vowel" for $250.')
-        elif 'exit the game' in allowed:
-            print('  To exit the game, type "exit game".')
-        player_guess = input(f"  Guess a {allowed[0]} or {allowed[1]}: >> ")
-        if player_guess.lower() == 'exit game':
-            quick_exit()
+        if 'vowel' in allowed:
+            print('\n  You have the opportunity to "Buy a Vowel" for $250.')
+        elif 'end turn' in allowed:
+            print("\n  You do not have enough money to buy a vowel.")
+            print('  To end your turn, type "end turn".')
+        player_guess = input(f"  Guess the {allowed[0]} or {allowed[1]}: >> ")
+        if player_guess.lower() == 'end turn':
+            return 'TURN ENDED'
             
-        if allowed == ['word','exit the game']:
+        if allowed == ['word','end turn']:
             allowed = 'word'
         passed = check_input(player_guess, allowed, 100)
+        if not passed and allowed == 'word':
+            allowed = ['word','end turn']
     
     # If the allowed inputs are not the group of 3 consonants and 1 vowel. 
     player_guess = player_guess.upper()
@@ -368,7 +385,8 @@ def take_guess(word, guessed_letters, allowed):
             if player_guess == word:
                 turn_result = 'WON ROUND'
             else: 
-                turn_result = 'LOST TURN'
+                turn_result = 'BAD GUESS'
+                player_guess = []
         else:
             if allowed == ['word','consonant']:
                 if player_guess in word:
@@ -379,11 +397,11 @@ def take_guess(word, guessed_letters, allowed):
                 if player_guess in word:
                     turn_result = 'GOOD VOW GUESS'
                 else:
-                    turn_result = 'BAD GUESS'
+                    turn_result = 'BAD VOW GUESS'
     else:
         turn_result = 'FREE GUESSES'
              
-    display_word(word, guessed_letters, player_guess)
+    display_word(word, guessed_letters, player_guess,False)
     
     correct_guesses = 0
     total_guesses = 0
@@ -420,6 +438,8 @@ def manage_bank(players,player,task,earnings):
         players[player]['stash'] = 0
     elif task == 'GOOD CONS':
         players[player]['stash'] += earnings
+    elif task == 'VOWEL':
+        players[player]['stash'] -= earnings
     return players
 
 
@@ -434,8 +454,9 @@ def player_turn(players,player,current_round,word,layout,guessed_letters):
             menu_to_display = menus[2]
         else:
             menu_to_display = menus[1]
-        os.system(clear_term)
-        print(template[3])
+        # clean_screen()
+        display_word(word, guessed_letters, [],True)
+        #print(template[3])
         display_turn_info(players[player],current_round)
         print(menu_to_display)
 
@@ -446,49 +467,69 @@ def player_turn(players,player,current_round,word,layout,guessed_letters):
             passed = check_input(choice,'number',num_options)
 
         if choice == '1':
-            spin = get_spin_result(layout)
-            ##display_wheels(spin,layout) # remove comment to activate spinning
+            if not spun:
+                spin = get_spin_result(layout)
+                ##display_wheels(spin,layout) # remove comment to activate spinning
             
-            if spin == 'MYSTERY 1000':
-                spin == 1000
-            elif spin == 'ONE MILLION DOLLARS':
-                spin == 1000000
-             
-            spin_poss = spin
-            os.system(clear_term)
-            print(template[3])
-            if str(spin).isnumeric():
-                spin_poss = "$" + str(spin)
-            print(f'  Possible Earnings: {spin_poss}')
+                if spin == 'MYSTERY 1000':
+                    spin = 1000
+                elif spin == 'ONE MILLION DOLLARS':
+                    spin = 1000000
+                    
+                spin_poss = spin
+                # clean_screen()
+                # print(template[3])
+                display_word(word, guessed_letters, [],True)
+               
+                if str(spin).isnumeric():
+                    print(f'  Possible Earnings: ${"{:,}".format(spin)}')
+                else:
+                    print(f'  Possible Earnings: {spin}')
             display_turn_info(players[player],current_round)
+            
+            if not spun:
+                current_spin = True
+            else:
+                current_spin = False
+                spin = 0
             spun = True
+            
             if spin in ['BANKRUPT','LOSE A TURN','MYSTERY BANKRUPT']:
                 if spin == 'BANKRUPT':
                     players = manage_bank(players,player,'BANKRUPT',None)
                 return players
             else:
-                if spun:
+                if (spun and not current_spin):
                     if players[player]['stash'] < 250:
-                        allowed = ['word','exit the game']
+                        allowed = ['word','end turn']
                     else:
-                        allowed = ['word','vowel']:
+                        allowed = ['word','vowel']
                 else:
                     allowed = ['word','consonant']
+                 
                 guess_result = take_guess(word, guessed_letters, allowed)
                 
-                if guess_result[3] == 'LOST TURN':
-                    players = manage_bank(players,player,'BANKRUPT',None)
-                elif guess_result[3] == 'WON ROUND':
+                if guess_result in ['TURN ENDED','LOST TURN']:
+                    return players
+                
+                if guess_result[3] == 'WON ROUND':
                     if str(spin).isnumeric():
                         earned = spin
                     else:
                         earned = None
                     players = manage_bank(players,player,'WON ROUND',earned)
+                    return players
                 elif guess_result[3] == 'GOOD CONS GUESS':
                     if str(spin).isnumeric():
                         players = manage_bank(players,player,'GOOD CONS',spin)
                 elif guess_result[3] == 'BAD GUESS':
                     players = manage_bank(players,player,'BANKRUPT',None)
+                    return players
+                elif guess_result[3] in ['GOOD VOW GUESS','BAD VOW GUESS']:
+                    players = manage_bank(players,player,'VOWEL',250)
+                    if guess_result[3] == 'BAD VOW GUESS':
+                        return players
+                   
             display_turn_info(players[player],current_round)
 
         elif choice == '2':
@@ -507,12 +548,21 @@ def round_controller(players, current_round):
     word = get_random_word(words).upper()
     guessed_letters = []
     layout = establish_wheel_layout(current_round)
-    display_word(word, guessed_letters, [])
+    display_word(word, guessed_letters, [],False)
     if current_round < 3:
         available_players = [_ for _ in players.keys()]
-        player_queue = build_player_queue(available_players) * 10
+        player_queue = build_player_queue(available_players) * 50
         for player in player_queue:
+            starting_bank = players[player]['bank']
             players = player_turn(players,player,current_round,word,layout,guessed_letters)
+            if players[player]['bank'] == starting_bank:
+                print("\n  Next Player...")
+            else:
+                print("\n  ***** WE HAVE A WINNER!!!! ***** \n")
+                print("  Starting Next Round...\n")
+                return players
+            #time.sleep(3)
+            
             
             
             
@@ -528,4 +578,5 @@ players = get_players()
 display_players(players,'dash')
 
 
-round_controller(players,1)
+for round_ in [1,2,3]:
+    round_controller(players,round_)
