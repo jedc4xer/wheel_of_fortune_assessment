@@ -20,6 +20,21 @@ General Game Play:
     
     The segment of the wheel that they land on, determines their game options.
     
+Wheel Structure:
+    
+    It is not entirely clear how the wheel should be structured, so I merged the described wheel with
+    a version that I found online. I populated the SPARE with either 500 or 900 to stay within rubric
+    guidelines, although versions I found online had the SPARES populated with higher numbers.
+    
+    There are 24 segments in the wheel:
+        - 17 Cash Segments
+        - 2 BANKRUPTS
+        - 1 MYSTERY
+        - 1 MILLIONS (Which includes an additonal 2 BANKRUPTS)
+        - 1 LOSE A TURN
+        - 1 JACKPOT (or SPARE depending on round)
+        - 1 SPARE
+    
 Game Rules:
 
     1. During rounds 1 and 2, the player can spin one time per turn. There is no spin in the final round.
@@ -29,61 +44,37 @@ Game Rules:
     5. A player's bank is safe and can not diminish.
     6. A player can only guess a vowel in these conditions: 
             - correctly guessed a consonant
-            - has at least %$%250 in their stash
-    
-Possible Outcomes:
-    1. Wheel lands on a number
-        A. Player guesses consonant that is in the puzzle
-            Result: They receive money shown on wheel
-                (Does not matter how many times consonant appears)
-        B. Player guesses a consonant that is not in the puzzle
-            Result: Player turn ends, and they receive no money
-    2. Wheel lands on BANKRUPT
-        Result: Player's turn ends, and they receive no money for that round. 
-    3. (STRETCH) Wheel lands on Million dollar segment
-            Result: If player completes the round as champion, they get the million dollars
-    4. (STRETCH) Player lands on Jackpot
-            Result: If player correctly answers the question, they get 5000 + the amount of all wheel spins
-            to that point in the round added to their bank.
-    5. (STRETCH) Player lands on mystery
-            Result: Player randomly receives either 1000 or bankruptcy
-            
-Rules:
-    1. If a player guesses a consonant successfully
-        Result: They get to buy a vowel for $250, and can continue to buy vowels.
-        You can only buy a vowel with the money earned during that round.
-    2. A player can guess the answer at any point on their turn
-        Result: If they guess the anwer correctly, they win the round. 
-                If they guess the answer wrong, they lose their turn.
-    3. The player with the most money at the end of round 2 goes on to round 3
-    4. If the answer is guessed, the round is over.
-    5. At the beginning of round 3, R-S-T-L-N-E are all revealed. The player can then guess 3 more consonants and 1 more vowel at no cost.
+            - has at least 250 dollars in their stash
+    7. If a player lands on MILLION DOLLARS and does not lose their winnings on their turn, it gets added to their stash.
+            - If the player correctly guesses the word on any subsequent turn, the million dollars is deposited to bank.
+    8. A player earns money by landing on a wheel segment that offers money, and then correctly guessing a consonant/word.
+            - A player deposits earned money by winning the round.
+            - A player loses earned money by incorrectly guessing a word or consonant.
+    9. If a player lands on JACKPOT:
+            - If they take a correct guess, then 5000 dollars is added to their jackpot stash.
+            - Every wheelspin thereafter from every player is added to their jackpot stash.
+            - If they correctly guess the word, their stash and jackpot stash is deposited in their bank.
+    10. If a player lands on MYSTERY
+            - Player will randomly receive either 1000 dollars or bankruptcy.
+    11. A player can continue to buy vowels until they run out of money or make an incorrect guess.
+    12. A player can guess the word at any point on their turn.
+            - An incorrect guess means they lose their turn and stash.
+            - A correct guess means that they win the round, and their stash gets deposited to their bank.
+    13. The player with the most money at the end of round 2 goes on to round 3.
+    14. The round ends when the answer is guessed.
+            - This creates the possibility for a very long running loop if players are unable to accumulate 
+                enough money to purchase a vowel, and have guessed all the consonants. The only way to break the 
+                loop would be to guess the word, and most humans would probably not be capable of that in any reasonable
+                amount of time.
+    15. At the beginning of the third round, R-S-T-L-N-E are all revealed. 
+            - The player can then guess 3 more consonants and 1 more vowel at no cost.
     6. For round 3, they have one opportunity and no more than 5 seconds to guess the correct answer.
-    7. The prize for the final round is determined by me.
+    7. The prize for the final round is determined by the game host.
     
 Gameplay:
     1. Spin the wheel
     2. Take action based on wheel selection
     3. Spin wheel for consonants
     
-Wheel:
-    1. Wheel has 24 segments 24*3 (just change probability for million dollar version).
-    2. 4 Segments are bankrupt.
-    3. Many segments have cash values in $50 intervals between 100 and 900
-    4. One segment is lose a turn
-    5. One Segment is jackpot
-    6. One Segment is million dollars
-    7. One Segment is mystery
-   
-   
-   """
-#         JACKPOT is a very difficult one to reason out. My interpretation is
-#         that if a player lands on jackpot, then the jackpot starts growing at
-#         5000 and accumulates additional based on every following player's
-#         wheelspins. The player that lands on jackpot can win the jackpot by 
-#         guessing the answer during their turn, and if their turn ends, they
-#         will need to wait for their following turn to attempt a guess. Any 
-#         number of players can land on jackpot, and the winner will be the one
-#         who correctly answers. If they land on jackpot on more than one turn, 
-#         they get an additional 5000.
-#         """
+
+  
