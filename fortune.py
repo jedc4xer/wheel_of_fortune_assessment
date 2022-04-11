@@ -51,7 +51,7 @@ def get_files(path):
 
 
 def get_wheels():
-    path = "https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/ascii_wheels.txt"
+    path = "https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/funny_wheels.txt"
     wheels = get_files(path).split(",")
     return wheels
 
