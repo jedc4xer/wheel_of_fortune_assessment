@@ -49,6 +49,7 @@ Game Rules:
             - If the player correctly guesses the word on any subsequent turn, the million dollars is deposited to bank.
     8. A player earns money by landing on a wheel segment that offers money, and then correctly guessing a consonant/word.
             - A player deposits earned money by winning the round.
+            - A player can also earn money by having money in their stash at the end of the round.
             - A player loses earned money by incorrectly guessing a word or consonant.
     9. If a player lands on JACKPOT:
             - If they take a correct guess, then 5000 dollars is added to their jackpot stash.
