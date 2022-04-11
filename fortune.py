@@ -220,7 +220,6 @@ def display_final_stats(players):
 
 
 def display_wheels(spin, layout):
-    #wheels = get_wheels()[:-1]
 
     dw = 0  # dw is 'displayed_wheel'
     layout_increment = 0
@@ -313,11 +312,9 @@ def display_word(word, guessed_letters, new_guess, sudden):
             print(template[3])
             revealing += char
             print(revealing.center(78, " "))
-            # time.sleep(0.2)
             pause_run(0.1)
-
-        # time.sleep(2)
-        pause_run(0.2)
+        
+        pause_run(2)
 
     revealed = "  "
     for char in word:
@@ -589,7 +586,7 @@ def player_turn(
             menu_to_display = menus[2]
         else:
             menu_to_display = menus[1]
-        # clean_screen()
+
         display_word(word, guessed_letters, [], True)
         if current_round == 3:
             display_possible_earnings(spin)
