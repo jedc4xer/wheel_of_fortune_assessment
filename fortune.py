@@ -51,11 +51,8 @@ def get_files(path):
 
 
 def get_wheels():
-    
-    path = 'https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/ascii_wheels.txt'
-    if "*" in user_params:
-        path = "https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/alternate_wheel.txt"
-        
+    path = "https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/ascii_wheels.txt"
+    # path = "https://raw.githubusercontent.com/jedc4xer/wheel_of_fortune_assessment/main/alternate_wheel.txt"
     wheels = get_files(path).split(",")
     return wheels
 
@@ -317,7 +314,7 @@ def display_word(word, guessed_letters, new_guess, sudden):
             revealing += char
             print(revealing.center(78, " "))
             pause_run(0.1)
-        
+
         pause_run(2)
 
     revealed = "  "
@@ -448,19 +445,19 @@ def set_difficulty():
     passed = False
     while not passed:
         difficulty = input("  Game Difficulty: >> ")
-        
+
         if "*" in difficulty:
             user_params.append("*")
             difficulty = difficulty.replace("*", "")
-            print('\n  Special Param 1 Set')
+            print("\n  Special Param 1 Set")
             time.sleep(1)
-            
+
         if "^" in difficulty:
             user_params.append("^")
             difficulty = difficulty.replace("^", "")
-            print('\n  Special Param 2 Set')
+            print("\n  Special Param 2 Set")
             time.sleep(1)
-            
+
         passed = check_input(difficulty, "number", 4)
     difficulty = {"1": "basic assessment", "2": "easy", "3": "medium", "4": "hard"}[
         difficulty
@@ -486,6 +483,7 @@ def manage_bank(players, player, task, earnings):
 
 # Heavy Functions (Round Controller, Player Turn, Word Guess)
 ##################################################
+
 
 def take_guess(word, guessed_letters, allowed):
     """ This function validates and manages a player guess. """
@@ -608,7 +606,7 @@ def player_turn(
             if not spun:
                 spin = get_spin_result(layout)
                 if "^" not in user_params:
-                    display_wheels(spin,layout)
+                    display_wheels(spin, layout)
 
                 if spin == "MYSTERY 1000":
                     spin = 1000
@@ -644,16 +642,15 @@ def player_turn(
 
                 if current_round > 2:
                     allowed = ["consonant", "vowel"]
-                
+
                 # This call accepts and analyzes the guess
                 guess_result = take_guess(word, guessed_letters, allowed)
                 if type(guess_result) != list:
                     return players
-                
+
                 players[player]["correct"] += guess_result[0]
                 players[player]["guesses"] += guess_result[1]
-                
-                
+
                 if current_round > 2:
                     if guess_result[3] != "WON ROUND":
                         allowed = ["word", "final round"]
@@ -744,8 +741,9 @@ def round_controller(players, current_round):
             time.sleep(2)
             if current_round == 3:
                 display_final_stats(players)
-            return players 
+            return players
         time.sleep(3)
+
 
 # Build
 template = get_template()
@@ -758,8 +756,8 @@ difficulty = set_difficulty()
 words = get_words(difficulty)
 players = get_players()
 
-# 
+#
 display_players(players, "dash")
 
-for round_ in [1,2,3]:
+for round_ in [1, 2, 3]:
     round_controller(players, round_)
