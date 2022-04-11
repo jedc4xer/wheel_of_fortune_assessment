@@ -450,7 +450,11 @@ def set_difficulty():
             user_params.append("*")
             difficulty = difficulty.replace("*", "")
             print("\n  Special Param 1 Set")
+            if "^" not in difficulty:
+                print("  (You can activate a second cheat code by also entering a ^ when indicating difficulty.)")
+                time.sleep(1)
             time.sleep(1)
+            
 
         if "^" in difficulty:
             user_params.append("^")
