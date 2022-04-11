@@ -211,7 +211,7 @@ def display_final_stats(players):
         name = players[player]["name"]
         guesses = players[player]["guesses"]
         correct = players[player]["correct"]
-        bank = players[player]["bank"]
+        bank = "{:,}".format(players[player]["bank"])
         accuracy = 0
         if guesses != 0:
             accuracy = round((correct / guesses) * 100, 2)
@@ -238,7 +238,7 @@ def display_wheels(spin, layout):
         dw = 0 if dw + 1 >= len(wheels) else dw + 1
         layout_increment += 1
     if spin == "MYSTERY 1000" or spin == "MYSTERY BANKRUPT":
-        segment == "MYSTERY"
+        segment = "MYSTERY"
     else:
         segment = spin
 
