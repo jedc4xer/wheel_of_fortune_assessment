@@ -314,7 +314,7 @@ def display_word(word, guessed_letters, new_guess, sudden):
             revealing += char
             print(revealing.center(78, " "))
             # time.sleep(0.2)
-            pause_run(0.2)
+            pause_run(0.1)
 
         # time.sleep(2)
         pause_run(0.2)
@@ -447,9 +447,19 @@ def set_difficulty():
     passed = False
     while not passed:
         difficulty = input("  Game Difficulty: >> ")
+        
         if "*" in difficulty:
             user_params.append("*")
             difficulty = difficulty.replace("*", "")
+            print('\n  Special Param 1 Set')
+            time.sleep(1)
+            
+        if "^" in difficulty:
+            user_params.append("^")
+            difficulty = difficulty.replace("^", "")
+            print('\n  Special Param 2 Set')
+            time.sleep(1)
+            
         passed = check_input(difficulty, "number", 4)
     difficulty = {"1": "basic assessment", "2": "easy", "3": "medium", "4": "hard"}[
         difficulty

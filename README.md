@@ -72,9 +72,15 @@ Game Rules:
     7. The prize for the final round is determined by the game host.
     
 Gameplay:
-    1. Spin the wheel
-    2. Take action based on wheel selection
-    3. Spin wheel for consonants
     
-
+    - The player is introduced to the game.
+    - Player information is accepted.
+    - Round starts
+    - Word is picked
+    - Players are queued in random order and retain order throughout the round.
+    - Player actions occur
+    - Round ends when word is guessed and next round starts.
+    - Final round eliminates two players.
+    - Remaining player gets possible hint and free guesses before a 5 second timer for a final guess.
+    - Winner of final round gets cash prize.
   
